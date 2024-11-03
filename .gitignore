@@ -1,6 +1,7 @@
 .idea/
 out/
 *.txt
+src/Main.java
 
 ### IntelliJ IDEA ###
 out/
