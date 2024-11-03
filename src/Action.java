@@ -1,4 +1,5 @@
 public enum Action {
     ENCRYPT,
-    DECRYPT
+    DECRYPT,
+    BRUTE_FORCE
 }
