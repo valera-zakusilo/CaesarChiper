@@ -13,15 +13,14 @@ public class CLI {
     private final String UNKNOWN_INPUT_MESSAGE = "Не відома команда. Спробуйте ще раз.";
 
     private Caesar Caesar = null;
-    private Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner = new Scanner(System.in);
 
     public CLI(){
         boolean isExit = false;
-        String userInput = "";
         System.out.println(WELCOME_MESSAGE);
         while (!isExit) {
             printMenu();
-            userInput = scanner.nextLine();
+            String userInput = scanner.nextLine();
             switch (userInput){
                 case "1" -> encryptFileMenu();
                 case "2" -> decryptFileMenu();
