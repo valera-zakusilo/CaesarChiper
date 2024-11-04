@@ -1,58 +1,79 @@
-import java.util.List;
+import java.util.*;
 
 public class Caesar {
-    private final List<String> ENG_ALPHABET_CAPITALS = List.of("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z");
-    private final List<String> ENG_ALPHABET_SMALL = List.of("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z");
-    private final List<String> UA_ALPHABET_CAPITALS = List.of("А", "Б", "В", "Г", "Ґ", "Д", "Е", "Є", "Ж", "З", "И", "І", "Ї", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ь", "Ю", "Я");
-    private final List<String> UA_ALPHABET_SMALL = List.of("а", "б", "в", "г", "ґ", "д", "е", "є", "ж", "з", "и", "і", "ї", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "щ", "ь", "ю", "я");
+    private final List<String> ENG_ALPHABET = List.of("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z");
+    private final List<String> UA_ALPHABET = List.of("А", "Б", "В", "Г", "Ґ", "Д", "Е", "Є", "Ж", "З", "И", "І", "Ї", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ь", "Ю", "Я", "а", "б", "в", "г", "ґ", "д", "е", "є", "ж", "з", "и", "і", "ї", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "щ", "ь", "ю", "я");
     private final List<String> SYMBOLS_ALPHABET = List.of(".", ",", "«", "»", "\"", "\'", ":", "!", "?", " ");
 
-    private final FileService FILE_SERVICE = new FileService();
-
-    public Caesar(Action action, String path, int key){
+    public Caesar(Action action, String textPath, int key){
+        String text = "";
         if (action.equals(Action.ENCRYPT)){
-            String text = FILE_SERVICE.readFile(path);
-            FILE_SERVICE.writeFile(path, encrypt(text,key), action);
+            text = FileService.readFile(textPath);
+            if (!text.equals(""))
+                FileService.writeFile(textPath, encrypt(text,key), action);
         } else if (action.equals(Action.DECRYPT)){
-            String text = FILE_SERVICE.readFile(path);
-            FILE_SERVICE.writeFile(path, decrypt(text,key), action);
+            text = FileService.readFile(textPath);
+            if (!text.equals(""))
+                FileService.writeFile(textPath, decrypt(text,key), action);
         }
     }
 
-    public String encrypt(String input, int key){
-        String encryptedText = "";
+    public Caesar(Action action, String textPath, String wordsPath){
+        if (action.equals(Action.BRUTE_FORCE)){
+            String text = FileService.readFile(textPath);
+            String[] dictionary = FileService.readFile(wordsPath).split("\n");
+            FileService.writeFile(textPath, bruteForce(text, dictionary), action);
+        }
+    }
+
+    public String encrypt(String text, int key){
+        StringBuilder encryptedText = new StringBuilder();
         int letterIndex = 0;
-        for (String symbol:input.split("")){
+        for (String symbol:text.split("")){
             List<String> symbolOfAlphabet = getAlphabet(symbol);
             letterIndex = (symbolOfAlphabet.indexOf(symbol) + key) % symbolOfAlphabet.size();
-            encryptedText += symbolOfAlphabet.get(letterIndex);
+            encryptedText.append(symbolOfAlphabet.get(letterIndex));
         }
-        return encryptedText;
+        return encryptedText.toString();
     }
 
-
-    public String decrypt(String input, int key){
-        String decryptedText = "";
+    public String decrypt(String text, int key){
+        StringBuilder decryptedText = new StringBuilder();
         int letterIndex = 0;
-        for (String symbol:input.split("")){
+        for (String symbol:text.split("")){
             List<String> symbolOfAlphabet = getAlphabet(symbol);
             letterIndex = (symbolOfAlphabet.indexOf(symbol) - key) % symbolOfAlphabet.size();
             if (letterIndex < 0)
                 letterIndex += symbolOfAlphabet.size();
-            decryptedText += symbolOfAlphabet.get(letterIndex);
+            decryptedText.append(symbolOfAlphabet.get(letterIndex));
         }
-        return decryptedText;
+        return decryptedText.toString();
+    }
+
+    public String bruteForce(String text, String[] dictionary){
+        Map<Integer,String> possibleText = new HashMap<>();
+        for (int i = 0; i < getAlphabet("A").size(); i++){
+            String decryptedText = decrypt(text,i);
+            for (String word : dictionary){
+                if (decryptedText.toLowerCase().contains(" " + word + " "))
+                    possibleText.put(i,decryptedText);
+            }
+        }
+        StringBuilder output = new StringBuilder();
+        for (Integer i : possibleText.keySet()){
+            output.append("Ключ шифрування = " + i + "\nДешифрований текст: " + possibleText.get(i) + "\n");
+        }
+        return output.toString();
     }
 
     private List<String> getAlphabet(String symbol){
-        if (ENG_ALPHABET_CAPITALS.contains(symbol))
-            return ENG_ALPHABET_CAPITALS;
-        else if (ENG_ALPHABET_SMALL.contains(symbol))
-            return ENG_ALPHABET_SMALL;
-        else if (SYMBOLS_ALPHABET.contains(symbol))
-            return SYMBOLS_ALPHABET;
+        List<String> alhabet = new ArrayList<>();
+        alhabet.addAll(ENG_ALPHABET);
+        alhabet.addAll(UA_ALPHABET);
+        alhabet.addAll(SYMBOLS_ALPHABET);
+        if (alhabet.contains(symbol))
+            return alhabet;
         return List.of(symbol);
     }
-
 
 }

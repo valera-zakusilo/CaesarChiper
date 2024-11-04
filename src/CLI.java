@@ -8,14 +8,14 @@ public class CLI {
     private final String MENU_MESSAGE_BRUTEFORCE = "3. Декодувати повідомлення";
     private final String MENU_MESSAGE_EXIT = "0. Завершити програму";
     private final String INPUT_FILE_NAME_MESSAGE = "Введіть місцерозташування файлу: ";
+    private final String INPUT_DICTIONARY_NAME_MESSAGE = "Введіть місцерозташування словника: ";
     private final String INPUT_KEY_MESSAGE = "Введіть ключ шифрування: ";
     private final String UNKNOWN_INPUT_MESSAGE = "Не відома команда. Спробуйте ще раз.";
 
     private Caesar Caesar = null;
-    private final FileService FILE_SERVICE = new FileService();
+    private Scanner scanner = new Scanner(System.in);
 
     public CLI(){
-        Scanner scanner = new Scanner(System.in);
         boolean isExit = false;
         String userInput = "";
         System.out.println(WELCOME_MESSAGE);
@@ -23,9 +23,9 @@ public class CLI {
             printMenu();
             userInput = scanner.nextLine();
             switch (userInput){
-                case "1" -> encryptFileMenu(scanner);
-                case "2" -> decryptFileMenu(scanner);
-                case "3" -> bruteforceFileMenu(new Scanner(System.in));
+                case "1" -> encryptFileMenu();
+                case "2" -> decryptFileMenu();
+                case "3" -> bruteforceFileMenu();
                 case "0" -> {
                     System.out.println("До наступної зустрічі!");
                     isExit = true;
@@ -43,30 +43,42 @@ public class CLI {
         System.out.println(MENU_MESSAGE_EXIT);
     }
 
-    public void encryptFileMenu(Scanner scanner){
+    public void encryptFileMenu(){
         System.out.print(INPUT_FILE_NAME_MESSAGE);
         String filePath = scanner.nextLine();
-        System.out.print(INPUT_KEY_MESSAGE);
-        int key = Integer.parseInt(scanner.nextLine());
-        Caesar = new Caesar(Action.ENCRYPT,filePath,key);
-        System.out.println("Файл зашифровано!");
+        if (Checker.isFileExist(filePath)) {
+            System.out.print(INPUT_KEY_MESSAGE);
+            String keyString = scanner.nextLine();
+            if (Checker.isNumber(keyString)) {
+                int key = Integer.parseInt(keyString);
+                Caesar = new Caesar(Action.ENCRYPT, filePath, key);
+            }
+        }
     }
 
-    public void decryptFileMenu(Scanner scanner){
+    public void decryptFileMenu(){
         System.out.print(INPUT_FILE_NAME_MESSAGE);
         String filePath = scanner.nextLine();
-        System.out.print(INPUT_KEY_MESSAGE);
-        int key = Integer.parseInt(scanner.nextLine());
-        //String textFromFile = FILE_SERVICE.readFile(filePath);
-        //String encryptedText = Caesar.decrypt(textFromFile,key);
-        //FILE_SERVICE.writeFile(filePath,encryptedText,Action.DECRYPT);
-        Caesar = new Caesar(Action.DECRYPT,filePath,key);
-        System.out.println("Файл розшифровано!");
+        if (Checker.isFileExist(filePath)) {
+            System.out.print(INPUT_KEY_MESSAGE);
+            String keyString = scanner.nextLine();
+            if (Checker.isNumber(keyString)) {
+                int key = Integer.parseInt(keyString);
+                Caesar = new Caesar(Action.DECRYPT, filePath, key);
+            }
+        }
     }
 
-    public void bruteforceFileMenu(Scanner scanner){
+    public void bruteforceFileMenu(){
         System.out.print(INPUT_FILE_NAME_MESSAGE);
         String filePath = scanner.nextLine();
+        if (Checker.isFileExist(filePath)){
+            System.out.println(INPUT_DICTIONARY_NAME_MESSAGE);
+            String dictionaryPath = scanner.nextLine();
+            if (Checker.isFileExist(dictionaryPath)){
+                Caesar = new Caesar(Action.BRUTE_FORCE, filePath, dictionaryPath);
+            }
+        }
     }
 
 

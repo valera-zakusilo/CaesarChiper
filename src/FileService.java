@@ -1,34 +1,45 @@
 import java.io.*;
 
 public class FileService {
+    public static FileService instance;
 
-    public FileService(){
+    private FileService(){
 
     }
 
-    public String readFile(String path){
-        String message = "";
+    public static FileService getInstance(){
+        return instance;
+    }
+
+    public static String readFile(String path){
+        StringBuilder message = new StringBuilder();
         try (FileReader input = new FileReader(path);
         BufferedReader reader = new BufferedReader(input)) {
             while (reader.ready()){
-                message += reader.readLine() + "\n";
+                message.append(reader.readLine() + "\n");
             }
         } catch (IOException e){
-            System.out.println("File not found!");
+            System.out.println("Файл не знайдено!");
         }
-        return message;
+        return message.toString();
     }
 
-    public void writeFile(String path, String message, Action action){
-        File file = new File(outputFilePath(path, action));
-        try (FileWriter output = new FileWriter(file.getPath())){
-            output.write(message);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public static void writeFile(String path, String text, Action action){
+        if (Checker.isFileExist(path)) {
+            String outputPath = outputFilePath(path, action);
+            File file = new File(outputPath);
+            try (FileWriter output = new FileWriter(file.getPath())) {
+                output.write(text);
+            } catch (IOException e) {
+                System.out.println("Файл не збережено!");
+            }
+        } else if (action.equals(Action.ENCRYPT))
+            System.out.println("Цей файл вже зашифровано!");
+        else if (action.equals(Action.DECRYPT))
+            System.out.println("Цей файл вже розшифровано!");
     }
 
-    private String outputFilePath(String path, Action action){
+    private static String outputFilePath(String path, Action action){
         String output = "";
         for (String sym : path.split("")){
             if (sym.equals(".")){
