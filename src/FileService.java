@@ -42,20 +42,18 @@ public class FileService {
     private static String outputFilePath(String path, Action action){
         String output = "";
         String pathWithoutTag = path;
-        System.out.println(path.replace("[" + Action.ENCRYPT + "ED]",""));
         if (path.contains("[" + Action.ENCRYPT + "ED]"))
             pathWithoutTag = path.replace("[" + Action.ENCRYPT + "ED]","");
         else if (path.contains("[" + Action.DECRYPT + "ED]"))
             pathWithoutTag = path.replace("[" + Action.DECRYPT + "ED]","");
-        else if (path.contains("[" + Action.BRUTE_FORCE + "ED]"))
+        else if (path.contains("[" + Action.BRUTE_FORCE + "D]"))
             pathWithoutTag = path.replace("[" + Action.BRUTE_FORCE + "ED]","");
         for (String sym : pathWithoutTag.split("")){
             if (sym.equals(".")){
-                output += "[" + action.toString() + "ED]";
+                output += "[" + action + "ED]";
             }
             output += sym;
         }
-        System.out.println(output);
         return output;
     }
 }

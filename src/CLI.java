@@ -12,7 +12,7 @@ public class CLI {
     private final String INPUT_KEY_MESSAGE = "Введіть ключ шифрування: ";
     private final String UNKNOWN_INPUT_MESSAGE = "Не відома команда. Спробуйте ще раз.";
 
-    private Caesar Caesar = null;
+    private Caesar Caesar;
     private final Scanner scanner = new Scanner(System.in);
 
     public CLI(){
@@ -48,7 +48,7 @@ public class CLI {
         if (Checker.isFileExist(filePath)) {
             System.out.print(INPUT_KEY_MESSAGE);
             String keyString = scanner.nextLine();
-            if (Checker.isNumber(keyString)) {
+            if (Checker.isNumber(keyString, Action.ENCRYPT)) {
                 int key = Integer.parseInt(keyString);
                 Caesar = new Caesar(Action.ENCRYPT, filePath, key);
             }
@@ -61,7 +61,7 @@ public class CLI {
         if (Checker.isFileExist(filePath)) {
             System.out.print(INPUT_KEY_MESSAGE);
             String keyString = scanner.nextLine();
-            if (Checker.isNumber(keyString)) {
+            if (Checker.isNumber(keyString, Action.DECRYPT)) {
                 int key = Integer.parseInt(keyString);
                 Caesar = new Caesar(Action.DECRYPT, filePath, key);
             }

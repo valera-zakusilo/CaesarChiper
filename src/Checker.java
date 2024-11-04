@@ -1,4 +1,3 @@
-import javax.xml.transform.Source;
 import java.io.File;
 
 public class Checker {
@@ -19,13 +18,13 @@ public class Checker {
         return false;
     }
 
-    public static boolean isNumber(String s){
-        int number = 0;
+    public static boolean isNumber(String s, Action action){
         try {
-            number = Integer.parseInt(s);
+            Integer.parseInt(s);
             return true;
         } catch (NumberFormatException e){
-            System.out.println(s + " має бути числом!");
+            if (!action.equals(Action.BRUTE_FORCE))
+                System.out.println(s + " має бути числом!");
         }
         return false;
     }
